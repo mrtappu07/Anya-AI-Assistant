@@ -55,8 +55,8 @@ def chatbot():
         }
 
         # Send system prompt + conversation history to AI
-        response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+        response = client.responses.create(
+            model="gpt-4.1-mini",
             input=[system_prompt] + get_history()
         )
 
