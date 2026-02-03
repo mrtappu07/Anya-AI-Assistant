@@ -69,9 +69,9 @@ def chatbot():
 
     except Exception as e:
         print("OPENAI ERROR:", e)
-        return jsonify({"response": "AI connection failed","debug_error": str(e)
-                        
-                        })
+        bot_reply = str(e)
+                    
+                    
         bot_reply = "AI connection failed."
 
     return jsonify({"response": bot_reply})
