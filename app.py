@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from webbrowser import get
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
@@ -9,7 +10,6 @@ from memory import add_message, get_history
 app = Flask(__name__)
 
 # Secure: API key from environment variable
-OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
 client = OpenAI()
 
 @app.route("/")
@@ -56,23 +56,26 @@ def chatbot():
         }
 
         # Send system prompt + conversation history to AI
-        response = client.responses.create(
-            model="gpt-4.1-mini",
-            input=[system_prompt] + get_history()
+        response = client.chat.compilations.create(
+            model="gpt-3.5-turbo",
+            messages=[
+            {
+                "role":"system",
+                "content":(
+                    "Your are Anya AI,a friendly assistent created by Tharun, Lavanya, Bhavana, Anu, Raja Vardhan, Nauman Ali, Mirza and Sanjay with the help of openAI."
+                )
+
+            }] + get history()
         )
 
         # Get AI reply
-        bot_reply = response.output_text
+        bot_reply = response.choices[0].message.content
 
         # Store AI reply in memory
         add_message("assistant", bot_reply)
 
-    except Exception as e:
-        print("OPENAI ERROR:", e)
-        bot_reply = str(e)
-                    
-                    
-        bot_reply = "AI connection failed."
+    except Exception:
+         bot_reply = "AI connection failed."
 
     return jsonify({"response": bot_reply})
 
