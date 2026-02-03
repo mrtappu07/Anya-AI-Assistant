@@ -9,7 +9,8 @@ from memory import add_message, get_history
 app = Flask(__name__)
 
 # Secure: API key from environment variable
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+client = OpenAI(api_key=OPENAI_API_KEY)
 
 @app.route("/")
 def home():
@@ -61,13 +62,16 @@ def chatbot():
         )
 
         # Get AI reply
-        bot_reply = response.choices[0].message.content
+        bot_reply = response.output_text
 
         # Store AI reply in memory
         add_message("assistant", bot_reply)
 
     except Exception as e:
-        print("ERROR:", e)
+        print("OPENAI ERROR:", e)
+        return jsonify({"response": "AI connection failed","debug_error": str(e)
+                        
+                        })
         bot_reply = "AI connection failed."
 
     return jsonify({"response": bot_reply})
