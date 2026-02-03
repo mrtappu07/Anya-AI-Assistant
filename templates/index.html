@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Anya AI Assistant</title>
+
+    <!-- Main chat styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <!-- Anya floating avatar styles -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='anya.css') }}">
+</head>
+
+<body>
+
+    <!-- ================= FLOATING ANYA (ALWAYS VISIBLE) ================= -->
+    <div id="anya-container">
+        <img
+            id="anya-avatar"
+            src="{{ url_for('static', filename='anya_idle.gif') }}"
+            alt="Anya AI"
+        />
+        <div class="anya-name">Anya</div>
+    </div>
+
+    <!-- ================= CHAT UI (HIDDEN BY DEFAULT) ================= -->
+    <div class="chat-container hidden" id="chat-ui">
+        <div class="chat-header">💬 Chat with Anya</div>
+
+        <div id="chat-box"></div>
+
+        <div class="input-container">
+            <input
+                type="text"
+                id="user-input"
+                placeholder="Type or speak..."
+            />
+
+            <!-- Voice input -->
+            <button onclick="startVoiceInput()">🎤</button>
+
+            <!-- Send -->
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <!-- ================= SCRIPTS (ORDER IS VERY IMPORTANT) ================= -->
+
+    <!-- Core chat logic -->
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <!-- Voice (STT + TTS) -->
+    <script src="{{ url_for('static', filename='voice.js') }}"></script>
+
+    <!-- Floating Anya behavior (click / double-click) -->
+    <script src="{{ url_for('static', filename='anya.js') }}"></script>
+
+    <!-- Emotion detection + animation -->
+    <script src="{{ url_for('static', filename='anya_emotion.js') }}"></script>
+
+</body>
+</html>
