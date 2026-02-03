@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Secure: API key from environment variable
 OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI()
 
 @app.route("/")
 def home():
