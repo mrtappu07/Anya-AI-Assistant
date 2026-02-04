@@ -9,7 +9,7 @@ from memory import add_message, get_history
 app = Flask(__name__)
 
 # Secure: API key from environment variable
-api_key = os.getnev("OPENAI_API_KEY")
+api_key = os.getenv("OPENAI_API_KEY")
 if not api_key:
     raise RuntimeError("OPENAI_API_KEY is missing")
 
