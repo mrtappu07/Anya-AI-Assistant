@@ -9,7 +9,11 @@ from memory import add_message, get_history
 app = Flask(__name__)
 
 # Secure: API key from environment variable
-client = OpenAI()
+api_key = os.getnev("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("OPENAI_API_KEY is missing")
+
+client = OpenAI(api_key=api_key)
 
 @app.route("/")
 def home():
@@ -55,10 +59,17 @@ def chatbot():
         }
 
         # Send system prompt + conversation history to AI
+        full_prompt = ( system_prompt["content"]
+        + "\n\nCoversation :\n"
+        +"\n".join([f"{m['role']} : {m['content']}"
+                    for m in get_history()])
+        )
+
         response = client.responses.create(
             model="gpt-4.1-mini",
-            input=[system_prompt] + get_history()
-        )
+            input=full_prompt
+            )
+        
 
         # Get AI reply
         bot_reply = response.output_text
@@ -66,8 +77,10 @@ def chatbot():
         # Store AI reply in memory
         add_message("assistant", bot_reply)
 
-    except Exception:
-         bot_reply = "AI connection failed."
+    except Exception as e:
+        print("OPENAI ERROR:", e)
+        raise
+        
 
     return jsonify({"response": bot_reply})
 
