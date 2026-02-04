@@ -1,6 +1,5 @@
 import os
 from datetime import datetime
-from webbrowser import get
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI
 
@@ -56,20 +55,13 @@ def chatbot():
         }
 
         # Send system prompt + conversation history to AI
-        response = client.chat.compilations.create(
-            model="gpt-3.5-turbo",
-            messages=[
-            {
-                "role":"system",
-                "content":(
-                    "Your are Anya AI,a friendly assistent created by Tharun, Lavanya, Bhavana, Anu, Raja Vardhan, Nauman Ali, Mirza and Sanjay with the help of openAI."
-                )
-
-            }] + get history()
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=[system_prompt] + get_history()
         )
 
         # Get AI reply
-        bot_reply = response.choices[0].message.content
+        bot_reply = response.output_text
 
         # Store AI reply in memory
         add_message("assistant", bot_reply)
