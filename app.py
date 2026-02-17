@@ -9,7 +9,15 @@ from memory import add_message, get_history
 app = Flask(__name__)
 
 # Secure: API key from environment variable
+<<<<<<< HEAD
 client = OpenAI(api_key=os.getenv("OPENROUTER_API_KEY"),base_url="https://openrouter.ai/api/v1")
+=======
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    raise RuntimeError("OPENAI_API_KEY is missing")
+
+client = OpenAI(api_key=api_key)
+>>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
 
 @app.route("/")
 def home():
@@ -55,10 +63,23 @@ def chatbot():
         }
 
         # Send system prompt + conversation history to AI
+<<<<<<< HEAD
         response = client.responses.create(
             model="openai/gpt-3.5-turbo",
             input=[system_prompt] + get_history()
         )
+=======
+        full_prompt = ( system_prompt["content"]
+        + "\n\nCoversation :\n"
+        +"\n".join([f"{m['role']} : {m['content']}"
+                    for m in get_history()])
+        )
+
+        response = client.responses.create(
+            model="gpt-4.1-mini",
+            input=full_prompt
+            )
+>>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
         
 
         # Get AI reply
@@ -68,12 +89,25 @@ def chatbot():
         add_message("assistant", bot_reply)
 
     except Exception as e:
+<<<<<<< HEAD
         print("ERROR:", e)
         bot_reply = "AI connection failed."
+=======
+        print("OPENAI ERROR:", e)
+        raise
+>>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
         
 
     return jsonify({"response": bot_reply})
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     app.run(host="0.0.0.0",
             port=int(os.environ.get("PORT", 5000)))
+=======
+import os
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
+>>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
