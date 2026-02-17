@@ -1,0 +1,110 @@
+/* 🤖 Floating Anya Assistant */
+
+#anya-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 140px;
+    text-align: center;
+    cursor: pointer;
+    z-index: 9999;
+}
+
+#anya-avatar {
+    width: 140px;
+    height: auto;
+    display: block;
+}
+
+.anya-name {
+    margin-top: 4px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #444;
+}
+
+/* 💬 Chat UI hidden by default */
+.hidden {
+    display: none;
+}
+
+/* ===============================
+   Anya Mouth Speaking Animation
+   =============================== */
+
+#anya-avatar.speaking {
+    animation: mouthMove 0.25s infinite alternate;
+}
+
+@keyframes mouthMove {
+    0% {
+        transform: scaleY(1);
+    }
+    100% {
+        transform: scaleY(0.85);
+    }
+}
+/* ===============================
+   Anya Size + Smooth Movement
+   =============================== */
+
+#anya-container {
+    transition: 
+        top 0.4s ease,
+        left 0.4s ease,
+        right 0.4s ease,
+        transform 0.4s ease,
+        width 0.4s ease;
+}
+
+/* Default: Center position + medium size */
+#anya-container.center-position {
+    width: 400px;          /* bigger & clearer */
+}
+
+/* Corner mode: top-right + smaller size */
+#anya-container.corner-position {
+    width: 210px;          /* small but still visible */
+}
+
+/* Image always fits container */
+#anya-avatar {
+    width: 100%;
+    height: auto;
+}
+
+/* ===============================
+   FORCE CORRECT DEFAULT POSITION
+   =============================== */
+
+/* Reset any old bottom/right rules */
+#anya-container {
+    bottom: auto !important;
+    right: auto !important;
+}
+
+/* CENTER position (default on load) */
+#anya-container.center-position {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    z-index: 1000;          /* slightly bigger, pleasant size */
+}
+
+/* TOP-RIGHT corner (chat mode) */
+#anya-container.corner-position {
+    position: fixed;
+    left: calc(50% + 230px);
+    top: 50%;
+    transform: translateY(-50%);
+    width: 210px;
+    z-index: 1001;          /* small size */
+}
+
+/* Image always fits container */
+#anya-avatar {
+    width: 100%;
+    height: auto;
+}
