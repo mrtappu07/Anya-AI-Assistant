@@ -1,7 +1,12 @@
-speechSynthesis.onvoiceschanged = () => {
-    console.log("Voices loaded:", speechSynthesis.getVoices());
-};
+// 🎤 Voice system loaded
 console.log("voice.js loaded");
+
+// Load voices
+let voices = [];
+speechSynthesis.onvoiceschanged = () => {
+    voices = speechSynthesis.getVoices();
+    console.log("Voices loaded:", voices);
+};
 
 // ---------- SPEECH TO TEXT (MIC) ----------
 let recognition;
@@ -36,7 +41,7 @@ function startVoiceInput() {
             const input = document.getElementById("user-input");
             if (input) {
                 input.value = text;
-                sendMessage(); // send automatically
+                sendMessage();
             }
         };
 
@@ -55,7 +60,7 @@ function startVoiceInput() {
     }
 }
 
-// ---------- TEXT TO SPEECH ----------
+// ---------- TEXT TO SPEECH (MALE VOICE) ----------
 function speakText(text) {
     if (!text) return;
 
@@ -67,37 +72,45 @@ function speakText(text) {
 
     const utterance = new SpeechSynthesisUtterance(cleanedText);
     utterance.lang = "en-US";
-    utterance.rate = 0.95;
-    utterance.pitch = 1.15;
+
+    // 🔥 VOICE SETTINGS (Male + Sweet)
+    utterance.rate = 0.9;   // slower = smoother
+    utterance.pitch = 0.85; // lower = deeper (male feel)
     utterance.volume = 1;
 
-    const voices = speechSynthesis.getVoices();
-    const femaleVoice =
-        voices.find(v => v.name.toLowerCase().includes("zira")) ||
-        voices.find(v => v.name.toLowerCase().includes("female")) ||
-        voices.find(v => v.name.toLowerCase().includes("google us english")) ||
-        voices.find(v => v.name.toLowerCase().includes("google")) ||
+    // 🎯 Select best male voice
+    let maleVoice =
+        voices.find(v => v.name.toLowerCase().includes("david")) || // Windows
+        voices.find(v => v.name.toLowerCase().includes("alex")) ||  // Mac
+        voices.find(v => v.name.toLowerCase().includes("male")) ||
+        voices.find(v => v.name.toLowerCase().includes("english")) ||
         voices.find(v => v.lang === "en-US");
 
-    if (femaleVoice) {
-        utterance.voice = femaleVoice;
+    if (maleVoice) {
+        utterance.voice = maleVoice;
+        console.log("Using voice:", maleVoice.name);
     }
 
+    // 🗣 TALKING ANIMATION
     utterance.onstart = () => {
         console.log("🔊 Speaking");
-        if (window.currentAnyaEmotion) {
-            document.getElementById("anya-avatar").src = "/static/anya_talk.gif";
+
+        const avatar = document.getElementById("anya-avatar");
+        if (avatar) {
+            avatar.src = "/static/anya_talk.gif";
         }
     };
 
     utterance.onend = () => {
         console.log("🔊 Done speaking");
+
+        // Restore previous emotion
         if (window.currentAnyaEmotion) {
             setAnyaEmotion(window.currentAnyaEmotion);
         }
     };
 
-    speechSynthesis.cancel();
+    speechSynthesis.cancel(); // stop previous speech
     speechSynthesis.speak(utterance);
 }
 

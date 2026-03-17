@@ -1,6 +1,6 @@
-// 😊 Anya Emotion Detection (Frontend Only – Final Stable Version)
+// 😊 Astra Emotion Detection (GIF Version – Final Stable)
 
-console.log("Anya emotion engine loaded");
+console.log("Astra emotion engine loaded");
 
 const anyaEmotions = {
     idle: "/static/anya_idle.gif",
@@ -11,10 +11,10 @@ const anyaEmotions = {
     angry: "/static/anya_angry.gif"
 };
 
-// ✅ INITIALIZE DEFAULT EMOTION (CRITICAL FIX)
+// Default emotion
 window.currentAnyaEmotion = "idle";
 
-// Detect emotion from user text
+// Detect emotion
 function detectEmotion(text) {
     if (!text) return "idle";
 
@@ -60,20 +60,19 @@ function detectEmotion(text) {
     return "idle";
 }
 
-// Change Anya avatar safely
+// Change GIF
 function setAnyaEmotion(emotion) {
     const avatar = document.getElementById("anya-avatar");
 
     if (!avatar) {
-        console.error("Anya avatar not found in DOM");
+        console.error("Astra avatar not found");
         return;
     }
 
-    // ⭐ STORE CURRENT EMOTION GLOBALLY (CRITICAL FIX)
     window.currentAnyaEmotion = emotion;
 
     const newSrc = anyaEmotions[emotion] || anyaEmotions.idle;
     avatar.src = newSrc;
 
-    console.log("Changing Anya emotion to:", emotion);
+    console.log("Emotion changed to:", emotion);
 }

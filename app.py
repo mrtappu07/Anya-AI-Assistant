@@ -31,7 +31,7 @@ def chatbot():
         system_prompt = {
             "role": "system",
             "content": (
-                f"You are Anya AI, a cute, friendly assistant. "
+                f"You are Astra AI, a friendly assistant. "
                 f"You were created by Tharun and Group CSE Final Year students "
                 f"with the help of OpenAI. "
                 f"Today's date is {today}. "

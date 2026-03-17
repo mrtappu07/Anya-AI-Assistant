@@ -17,10 +17,11 @@
 }
 
 .anya-name {
-    margin-top: 4px;
-    font-size: 14px;
+    font-size: 22px;
     font-weight: bold;
-    color: #444;
+    text-align: center;
+    color: #333;
+    margin-top: 5px;
 }
 
 /* 💬 Chat UI hidden by default */
