@@ -1,12 +1,29 @@
 // 🎤 Voice system loaded
 console.log("voice.js loaded");
 
+// 🔊 VOICE CONTROL
+let voiceEnabled = false;      // Chat UI default = OFF
+let forceVoiceMode = false;   // Single-click mode = FORCE ON
+
 // Load voices
 let voices = [];
 speechSynthesis.onvoiceschanged = () => {
     voices = speechSynthesis.getVoices();
     console.log("Voices loaded:", voices);
 };
+
+// 🔘 TOGGLE BUTTON FUNCTION
+function toggleVoice() {
+    voiceEnabled = !voiceEnabled;
+
+    const btn = document.getElementById("voice-toggle");
+
+    if (voiceEnabled) {
+        btn.innerText = "🔊 Voice ON";
+    } else {
+        btn.innerText = "🔇 Voice OFF";
+    }
+}
 
 // ---------- SPEECH TO TEXT (MIC) ----------
 let recognition;
@@ -64,7 +81,6 @@ function startVoiceInput() {
 function speakText(text) {
     if (!text) return;
 
-    // Remove emojis but KEEP math symbols
     const cleanedText = text.replace(
         /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF][\uDC00-\uDFFF])/g,
         ""
@@ -73,15 +89,14 @@ function speakText(text) {
     const utterance = new SpeechSynthesisUtterance(cleanedText);
     utterance.lang = "en-US";
 
-    // 🔥 VOICE SETTINGS (Male + Sweet)
-    utterance.rate = 0.9;   // slower = smoother
-    utterance.pitch = 0.85; // lower = deeper (male feel)
+    // 🔥 Male + Sweet voice tuning
+    utterance.rate = 0.9;
+    utterance.pitch = 0.85;
     utterance.volume = 1;
 
-    // 🎯 Select best male voice
     let maleVoice =
-        voices.find(v => v.name.toLowerCase().includes("david")) || // Windows
-        voices.find(v => v.name.toLowerCase().includes("alex")) ||  // Mac
+        voices.find(v => v.name.toLowerCase().includes("david")) ||
+        voices.find(v => v.name.toLowerCase().includes("alex")) ||
         voices.find(v => v.name.toLowerCase().includes("male")) ||
         voices.find(v => v.name.toLowerCase().includes("english")) ||
         voices.find(v => v.lang === "en-US");
@@ -91,7 +106,7 @@ function speakText(text) {
         console.log("Using voice:", maleVoice.name);
     }
 
-    // 🗣 TALKING ANIMATION
+    // 🗣 Talking animation
     utterance.onstart = () => {
         console.log("🔊 Speaking");
 
@@ -104,22 +119,25 @@ function speakText(text) {
     utterance.onend = () => {
         console.log("🔊 Done speaking");
 
-        // Restore previous emotion
         if (window.currentAnyaEmotion) {
             setAnyaEmotion(window.currentAnyaEmotion);
         }
     };
 
-    speechSynthesis.cancel(); // stop previous speech
+    speechSynthesis.cancel();
     speechSynthesis.speak(utterance);
 }
 
-// ---------- AUTO SPEAK BOT MESSAGE ----------
+// ---------- CONTROLLED AUTO SPEAK ----------
 const originalAddMessage = window.addMessage;
+
 window.addMessage = function (text, sender) {
     originalAddMessage(text, sender);
 
     if (sender === "bot") {
-        speakText(text);
+        // 🔥 KEY LOGIC
+        if (voiceEnabled || forceVoiceMode) {
+            speakText(text);
+        }
     }
 };

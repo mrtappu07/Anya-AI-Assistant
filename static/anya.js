@@ -13,7 +13,7 @@ function bindAnyaEvents() {
         return;
     }
 
-    console.log("Anya controller loaded with position logic");
+    console.log("Astra controller loaded with position + voice mode logic");
 
     // 🔹 Default position: CENTER
     anya.classList.add("center-position");
@@ -22,12 +22,18 @@ function bindAnyaEvents() {
     anya.addEventListener("pointerdown", () => {
         clickCount++;
 
+        // ================= SINGLE CLICK =================
         if (clickCount === 1) {
-            // Wait to check for double click
             clickTimer = setTimeout(() => {
-                // SINGLE CLICK → MIC ONLY (POSITION UNCHANGED)
-                console.log("Anya single click → mic ON (stay center)");
+                console.log("Astra single click → voice mode ON");
 
+                // 🎤 Enable FORCE voice mode
+                if (typeof forceVoiceMode !== "undefined") {
+                    forceVoiceMode = true;
+                    voiceEnabled = true;
+                }
+
+                // Start mic
                 if (typeof startVoiceInput === "function") {
                     startVoiceInput();
                 }
@@ -36,15 +42,27 @@ function bindAnyaEvents() {
             }, DOUBLE_CLICK_TIME);
         }
 
+        // ================= DOUBLE CLICK =================
         else if (clickCount === 2) {
-            // DOUBLE CLICK → CHAT + MOVE TO CORNER
-            console.log("Anya double click → chat + move to corner");
+            console.log("Astra double click → chat mode (voice OFF)");
 
             clearTimeout(clickTimer);
             clickTimer = null;
             clickCount = 0;
 
-            // Move Anya to top-right corner
+            // 🔇 Disable voice in chat mode
+            if (typeof forceVoiceMode !== "undefined") {
+                forceVoiceMode = false;
+                voiceEnabled = false;
+            }
+
+            // Reset button UI
+            const btn = document.getElementById("voice-toggle");
+            if (btn) {
+                btn.innerText = "🔇 Voice OFF";
+            }
+
+            // Move Astra to top-right corner
             anya.classList.remove("center-position");
             anya.classList.add("corner-position");
 
