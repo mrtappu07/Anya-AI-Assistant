@@ -20,8 +20,19 @@ function toggleVoice() {
 
     if (voiceEnabled) {
         btn.innerText = "🔊 Voice ON";
+
+        // 🔥 READ LAST BOT MESSAGE
+        const messages = document.querySelectorAll(".message.bot");
+        if (messages.length > 0) {
+            const lastMsg = messages[messages.length - 1].innerText;
+            speakText(lastMsg);
+        }
+
     } else {
         btn.innerText = "🔇 Voice OFF";
+
+        // 🔥 STOP SPEAKING IMMEDIATELY
+        speechSynthesis.cancel();
     }
 }
 
@@ -78,8 +89,12 @@ function startVoiceInput() {
 }
 
 // ---------- TEXT TO SPEECH (MALE VOICE) ----------
-function speakText(text) {
-    if (!text) return;
+    function speakText(text) {
+
+    // ❌ STOP if voice is OFF
+    if (!voiceEnabled && !forceVoiceMode) {
+        return;
+    }
 
     const cleanedText = text.replace(
         /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF][\uDC00-\uDFFF])/g,
@@ -108,13 +123,20 @@ function speakText(text) {
 
     // 🗣 Talking animation
     utterance.onstart = () => {
-        console.log("🔊 Speaking");
 
-        const avatar = document.getElementById("anya-avatar");
-        if (avatar) {
-            avatar.src = "/static/anya_talk.gif";
-        }
-    };
+    // ❌ Stop if turned OFF mid-speech
+    if (!voiceEnabled && !forceVoiceMode) {
+        speechSynthesis.cancel();
+        return;
+    }
+
+    console.log("🔊 Speaking");
+
+    const avatar = document.getElementById("anya-avatar");
+    if (avatar) {
+        avatar.src = "/static/anya_talk.gif";
+    }
+};
 
     utterance.onend = () => {
         console.log("🔊 Done speaking");
