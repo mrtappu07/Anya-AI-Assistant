@@ -73,7 +73,18 @@
         </button>
     </div>
 
-        <div id="chat-box"></div>
+        <div id="chat-box">
+
+    <!-- 🧠 LOAD OLD CHATS -->
+    {% if chats %}
+        {% for role, message in chats %}
+            <div class="message {{ role }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+</div>
 
         <div class="input-container">
             <input

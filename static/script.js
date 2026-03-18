@@ -35,7 +35,7 @@ function sendMessage() {
     })
     .then(res => res.json())
     .then(data => {
-        addMessage(data.response, "bot");
+        addMessage(data.response, "assistant");
 
         // 🔊 Speak response
         speak(data.response);
@@ -59,3 +59,9 @@ document.getElementById("user-input")
             sendMessage();
         }
     });
+
+    window.onload = function() {
+        const chatBox = 
+        this.document.getElementById("chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
+    };
