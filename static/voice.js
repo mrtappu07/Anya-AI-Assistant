@@ -5,13 +5,26 @@ console.log("voice.js loaded");
 let voiceEnabled = false;
 let forceVoiceMode = false;
 
-// Load voices
+// 🎧 VOICE STORAGE
 let voices = [];
 
-window.speechSynthesis.onvoiceschanged = () => {
-    voices = speechSynthesis.getVoices();
-    console.log("Voices loaded:", voices);
-};
+
+// 🔥 FORCE LOAD VOICES (STABLE)
+function loadVoices() {
+    const v = speechSynthesis.getVoices();
+
+    if (v.length > 0) {
+        voices = v;
+
+        console.log("✅ Voices loaded:", voices);
+        console.log("🎤 Voice Names:", voices.map(v => v.name));
+    } else {
+        setTimeout(loadVoices, 200);
+    }
+}
+
+// Run on start
+loadVoices();
 
 
 // 🔘 TOGGLE BUTTON
@@ -23,7 +36,6 @@ function toggleVoice() {
     if (voiceEnabled) {
         btn.innerText = "🔊 Voice ON";
 
-        // 🔥 Speak last assistant message
         const messages = document.querySelectorAll(".message.assistant");
 
         if (messages.length > 0) {
@@ -40,7 +52,6 @@ function toggleVoice() {
 
 // ---------- 🎤 SPEECH TO TEXT ----------
 let recognition;
-let isListening = false;
 
 function startVoiceInput() {
     const SpeechRecognition =
@@ -58,9 +69,7 @@ function startVoiceInput() {
         recognition.onresult = (event) => {
             const text = event.results[0][0].transcript;
 
-            const input = document.getElementById("user-input");
-            input.value = text;
-
+            document.getElementById("user-input").value = text;
             sendMessage();
         };
     }
@@ -74,6 +83,7 @@ function speakText(text) {
 
     if (!voiceEnabled && !forceVoiceMode) return;
 
+    // Clean emojis
     const cleanText = text.replace(
         /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF][\uDC00-\uDFFF])/g,
         ""
@@ -82,18 +92,21 @@ function speakText(text) {
     const utterance = new SpeechSynthesisUtterance(cleanText);
 
     utterance.lang = "en-US";
-    utterance.rate = 0.95;
-    utterance.pitch = 1;
+
+    // 🔥 DEEP MALE-LIKE TUNING
+    utterance.rate = 0.85;   // slower
+    utterance.pitch = 0.6;   // deeper (key for male feel)
     utterance.volume = 1;
 
-    // 🔥 Better voice selection
+    // 🔥 FORCE BEST AVAILABLE ENGLISH VOICE
     let selectedVoice =
-        voices.find(v => v.name.includes("Google")) ||
-        voices.find(v => v.lang === "en-US");
+        voices.find(v => v.name.includes("English")) ||
+        voices.find(v => v.lang === "en-US") ||
+        voices[0];
 
     if (selectedVoice) {
         utterance.voice = selectedVoice;
-        console.log("Using voice:", selectedVoice.name);
+        console.log("🎙 Using voice:", selectedVoice.name);
     }
 
     // 🗣 Avatar animation
@@ -111,19 +124,19 @@ function speakText(text) {
         }
     };
 
+    // 🔥 FIX: Ensure browser allows speech
     speechSynthesis.cancel();
+    speechSynthesis.resume();
     speechSynthesis.speak(utterance);
 }
 
 
-// ---------- 🔥 AUTO SPEAK FIX ----------
+// ---------- 🔥 AUTO SPEAK ----------
 const originalAppend = window.appendMessage;
 
 window.appendMessage = function (role, text) {
-
     originalAppend(role, text);
 
-    // ✅ FIX: assistant instead of bot
     if (role === "assistant") {
         if (voiceEnabled || forceVoiceMode) {
             speakText(text);
