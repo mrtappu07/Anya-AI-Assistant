@@ -1,6 +1,6 @@
-Flask
-openai
+flask
+gunicorn
 authlib
 requests
+openai
 python-dotenv
-gunicorn
