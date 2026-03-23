@@ -3,13 +3,15 @@ from datetime import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, session
 from openai import OpenAI
 from dotenv import load_dotenv
-load_dotenv()
 from authlib.integrations.flask_client import OAuth
+
+# Load env
+load_dotenv()
 
 # ✅ DATABASE
 from database import init_db, add_user, validate_user, save_chat, get_user_chats
 
-# Memory (optional, you can keep)
+# Memory
 from memory import add_message, get_history
 
 app = Flask(__name__)
@@ -86,7 +88,7 @@ def callback():
 
         email = user_info["email"]
 
-        # ✅ Auto-register Google user if not exists
+        # ✅ Auto register if not exists
         add_user(email, "google_login")
 
         session["user"] = email
@@ -125,28 +127,44 @@ def chatbot():
     user_email = session["user"]
 
     try:
-        # ✅ SAVE USER MESSAGE
+        # ✅ Save user message
         save_chat(user_email, "user", user_message)
         add_message("user", user_message)
 
         today = datetime.now().strftime("%B %d, %Y")
 
+        # 🔥 STRONG SYSTEM PROMPT (FIXED)
         system_prompt = {
             "role": "system",
-            "content": f"You are Astra AI , a smart assistant with voice capability."
-            f"you can respond in both text and voice."
-            f"Always give natural conversational replies."
-            f"Today's date is {today}."
+            "content": (
+                f"You are Astra AI, a friendly assistant. "
+                f"You were developed by CSE Final Year students gpt nizamabad "
+                f"Tharun, Lavanya, Bhavana, Anu, Raja Vardhan, Nauman Ali, "
+                f"Mirza and Sanjay with the help of OpenAI. "
+
+                f"If anyone asks who created you, ALWAYS reply EXACTLY with this sentence: "
+                f"'I was developed by CSE Final Year students gpt nizamabad Tharun, Lavanya, Bhavana, Anu, Raja Vardhan, Nauman Ali, Mirza and Sanjay with the help of OpenAI.' "
+
+                f"Do NOT change names. Do NOT summarize. Do NOT shorten. "
+
+                f"You can respond in both text and voice naturally. "
+                f"Today's date is {today}."
+            )
         }
+
+        # 🔥 INCLUDE CURRENT MESSAGE (VERY IMPORTANT FIX)
+        messages = [system_prompt] + get_history() + [
+            {"role": "user", "content": user_message}
+        ]
 
         response = client.responses.create(
             model="openai/gpt-3.5-turbo",
-            input=[system_prompt] + get_history()
+            input=messages
         )
 
         bot_reply = response.output_text
 
-        # ✅ SAVE BOT MESSAGE
+        # ✅ Save bot reply
         save_chat(user_email, "assistant", bot_reply)
         add_message("assistant", bot_reply)
 
@@ -159,4 +177,4 @@ def chatbot():
 
 # ================= RUN =================
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT",5000)))
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
