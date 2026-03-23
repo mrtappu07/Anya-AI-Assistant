@@ -133,7 +133,10 @@ def chatbot():
 
         system_prompt = {
             "role": "system",
-            "content": f"You are Astra AI. Today's date is {today}."
+            "content": f"You are Astra AI , a smart assistant with voice capability."
+            f"you can respond in both text and voice."
+            f"Always give natural conversational replies."
+            f"Today's date is {today}."
         }
 
         response = client.responses.create(

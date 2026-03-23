@@ -7,12 +7,11 @@
     <!-- Main chat styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 
-    <!-- veda floating avatar styles -->
+    <!-- Astra floating avatar styles -->
     <link rel="stylesheet" href="{{ url_for('static', filename='anya.css') }}">
-<<<<<<< HEAD
 
     <style>
-    /* ===== ASTRA INSTRUCTIONS STYLE (LEFT SIDE FIXED) ===== */
+    /* ===== ASTRA INSTRUCTIONS (LEFT SIDE FIXED) ===== */
     #anya-instructions {
         position: fixed;
         left: 20px;
@@ -35,25 +34,22 @@
     .instruction-box p {
         margin: 8px 0;
     }
-</style>
-=======
->>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
+    </style>
 </head>
 
 <body>
 
-    <!-- ================= FLOATING ASTRA (ALWAYS VISIBLE) ================= -->
+    <!-- ================= FLOATING ASTRA ================= -->
     <div id="anya-container">
         <img
             id="anya-avatar"
             src="{{ url_for('static', filename='anya_idle.gif') }}"
-            alt="Anya AI"
+            alt="Astra AI"
         />
         <div class="anya-name">Astra</div>
     </div>
 
-<<<<<<< HEAD
-    <!-- ================= ASTRA INSTRUCTIONS (NEW ADDITION) ================= -->
+    <!-- ================= INSTRUCTIONS ================= -->
     <div id="anya-instructions">
         <div class="instruction-box">
             <p>🎤 Single Click Astra → Voice Chat</p>
@@ -61,58 +57,62 @@
         </div>
     </div>
 
-=======
->>>>>>> ea41cc6a0ea38dc15db1df2418311a542baa868e
-    <!-- ================= CHAT UI (HIDDEN BY DEFAULT) ================= -->
+    <!-- ================= CHAT UI ================= -->
     <div class="chat-container hidden" id="chat-ui">
-        <div class="chat-header">💬 Chat with Astra</div>
-        <!-- 🔊 VOICE TOGGLE BUTTON -->
-    <div style="text-align: right; padding: 5px;">
-        <button id="voice-toggle" onclick="toggleVoice()">
-            🔇 Voice OFF
-        </button>
-    </div>
 
+        <div class="chat-header">💬 Chat with Astra</div>
+
+        <!-- 🔊 VOICE TOGGLE -->
+        <div style="text-align: right; padding: 5px;">
+            <button id="voice-toggle" onclick="toggleVoice()">
+                🔇 Voice OFF
+            </button>
+        </div>
+
+        <!-- ================= CHAT BOX ================= -->
         <div id="chat-box">
 
-    <!-- 🧠 LOAD OLD CHATS -->
-    {% if chats %}
-        {% for role, message in chats %}
-            <div class="message {{ role }}">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
+            {% if chats %}
+                {% for role, message in chats %}
+                    <div class="message {{ role }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
 
-</div>
+        </div>
 
+        <!-- ================= INPUT ================= -->
         <div class="input-container">
+
             <input
                 type="text"
                 id="user-input"
                 placeholder="Type or speak..."
             />
 
-            <!-- Voice input -->
+            <!-- 🎤 Voice Input -->
             <button onclick="startVoiceInput()">🎤</button>
 
-            <!-- Send -->
+            <!-- 📤 Send -->
             <button onclick="sendMessage()">Send</button>
+
         </div>
+
     </div>
 
-    <!-- ================= SCRIPTS (ORDER IS VERY IMPORTANT) ================= -->
+    <!-- ================= SCRIPTS ================= -->
 
-    <!-- Core chat logic -->
+    <!-- Chat logic -->
     <script src="{{ url_for('static', filename='script.js') }}"></script>
 
-    <!-- Voice (STT + TTS) -->
+    <!-- Voice (TTS + STT) -->
     <script src="{{ url_for('static', filename='voice.js') }}"></script>
 
-    <!-- Floating Anya behavior (click / double-click) -->
+    <!-- Astra click behavior -->
     <script src="{{ url_for('static', filename='anya.js') }}"></script>
 
-    <!-- Emotion detection + animation -->
+    <!-- Emotion system -->
     <script src="{{ url_for('static', filename='anya_emotion.js') }}"></script>
 
 </body>
