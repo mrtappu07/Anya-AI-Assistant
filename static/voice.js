@@ -2,17 +2,19 @@
 console.log("voice.js loaded");
 
 // 🔊 VOICE CONTROL
-let voiceEnabled = false;      // Chat UI default = OFF
-let forceVoiceMode = false;   // Single-click mode = FORCE ON
+let voiceEnabled = false;
+let forceVoiceMode = false;
 
 // Load voices
 let voices = [];
-speechSynthesis.onvoiceschanged = () => {
+
+window.speechSynthesis.onvoiceschanged = () => {
     voices = speechSynthesis.getVoices();
     console.log("Voices loaded:", voices);
 };
 
-// 🔘 TOGGLE BUTTON FUNCTION
+
+// 🔘 TOGGLE BUTTON
 function toggleVoice() {
     voiceEnabled = !voiceEnabled;
 
@@ -21,8 +23,9 @@ function toggleVoice() {
     if (voiceEnabled) {
         btn.innerText = "🔊 Voice ON";
 
-        // 🔥 READ LAST BOT MESSAGE
-        const messages = document.querySelectorAll(".message.bot");
+        // 🔥 Speak last assistant message
+        const messages = document.querySelectorAll(".message.assistant");
+
         if (messages.length > 0) {
             const lastMsg = messages[messages.length - 1].innerText;
             speakText(lastMsg);
@@ -30,119 +33,81 @@ function toggleVoice() {
 
     } else {
         btn.innerText = "🔇 Voice OFF";
-
-        // 🔥 STOP SPEAKING IMMEDIATELY
         speechSynthesis.cancel();
     }
 }
 
-// ---------- SPEECH TO TEXT (MIC) ----------
+
+// ---------- 🎤 SPEECH TO TEXT ----------
 let recognition;
 let isListening = false;
 
 function startVoiceInput() {
-    console.log("Mic button clicked");
-
     const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-        alert("Speech Recognition not supported in this browser");
+        alert("Speech Recognition not supported");
         return;
     }
 
     if (!recognition) {
         recognition = new SpeechRecognition();
         recognition.lang = "en-US";
-        recognition.continuous = false;
-        recognition.interimResults = false;
-
-        recognition.onstart = () => {
-            isListening = true;
-            console.log("🎤 Listening...");
-        };
 
         recognition.onresult = (event) => {
             const text = event.results[0][0].transcript;
-            console.log("🎤 Heard:", text);
 
             const input = document.getElementById("user-input");
-            if (input) {
-                input.value = text;
-                sendMessage();
-            }
-        };
+            input.value = text;
 
-        recognition.onerror = (e) => {
-            console.error("Mic error:", e);
-        };
-
-        recognition.onend = () => {
-            isListening = false;
-            console.log("🎤 Mic stopped");
+            sendMessage();
         };
     }
 
-    if (!isListening) {
-        recognition.start();
-    }
+    recognition.start();
 }
 
-// ---------- TEXT TO SPEECH (MALE VOICE) ----------
-    function speakText(text) {
 
-    // ❌ STOP if voice is OFF
-    if (!voiceEnabled && !forceVoiceMode) {
-        return;
-    }
+// ---------- 🔊 TEXT TO SPEECH ----------
+function speakText(text) {
 
-    const cleanedText = text.replace(
+    if (!voiceEnabled && !forceVoiceMode) return;
+
+    const cleanText = text.replace(
         /([\u2700-\u27BF]|[\uE000-\uF8FF]|[\uD83C-\uDBFF][\uDC00-\uDFFF])/g,
         ""
     );
 
-    const utterance = new SpeechSynthesisUtterance(cleanedText);
-    utterance.lang = "en-US";
+    const utterance = new SpeechSynthesisUtterance(cleanText);
 
-    // 🔥 Male + Sweet voice tuning
-    utterance.rate = 0.9;
-    utterance.pitch = 0.85;
+    utterance.lang = "en-US";
+    utterance.rate = 0.95;
+    utterance.pitch = 1;
     utterance.volume = 1;
 
-    let maleVoice =
-        voices.find(v => v.name.toLowerCase().includes("david")) ||
-        voices.find(v => v.name.toLowerCase().includes("alex")) ||
-        voices.find(v => v.name.toLowerCase().includes("male")) ||
-        voices.find(v => v.name.toLowerCase().includes("english")) ||
+    // 🔥 Better voice selection
+    let selectedVoice =
+        voices.find(v => v.name.includes("Google")) ||
         voices.find(v => v.lang === "en-US");
 
-    if (maleVoice) {
-        utterance.voice = maleVoice;
-        console.log("Using voice:", maleVoice.name);
+    if (selectedVoice) {
+        utterance.voice = selectedVoice;
+        console.log("Using voice:", selectedVoice.name);
     }
 
-    // 🗣 Talking animation
+    // 🗣 Avatar animation
     utterance.onstart = () => {
-
-    // ❌ Stop if turned OFF mid-speech
-    if (!voiceEnabled && !forceVoiceMode) {
-        speechSynthesis.cancel();
-        return;
-    }
-
-    console.log("🔊 Speaking");
-
-    const avatar = document.getElementById("anya-avatar");
-    if (avatar) {
-        avatar.src = "/static/anya_talk.gif";
-    }
-};
+        const avatar = document.getElementById("anya-avatar");
+        if (avatar) {
+            avatar.src = "/static/anya_talk.gif";
+        }
+    };
 
     utterance.onend = () => {
-        console.log("🔊 Done speaking");
-
-        if (window.currentAnyaEmotion) {
-            setAnyaEmotion(window.currentAnyaEmotion);
+        const avatar = document.getElementById("anya-avatar");
+        if (avatar) {
+            avatar.src = "/static/anya_idle.gif";
         }
     };
 
@@ -150,14 +115,16 @@ function startVoiceInput() {
     speechSynthesis.speak(utterance);
 }
 
-// ---------- CONTROLLED AUTO SPEAK ----------
-const originalAddMessage = window.addMessage;
 
-window.addMessage = function (text, sender) {
-    originalAddMessage(text, sender);
+// ---------- 🔥 AUTO SPEAK FIX ----------
+const originalAppend = window.appendMessage;
 
-    if (sender === "bot") {
-        // 🔥 KEY LOGIC
+window.appendMessage = function (role, text) {
+
+    originalAppend(role, text);
+
+    // ✅ FIX: assistant instead of bot
+    if (role === "assistant") {
         if (voiceEnabled || forceVoiceMode) {
             speakText(text);
         }
